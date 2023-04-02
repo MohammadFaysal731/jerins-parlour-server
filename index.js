@@ -14,15 +14,33 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-console.log(uri);
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
 
 async function run(){
+try{
+  const servicesCollection = client.db("jerins_palour").collection("services");
+  const reviewCollection = client.db("jerins_palour").collection("reviews");
+  const teamMembersCollection = client
+    .db("jerins_palour")
+    .collection("team_members");
+  // this api for all services
+  app.get("/services", async (rea, res) => {
+    const services = await servicesCollection.find().toArray();
+    res.send(services);
+  });
+  // this api for all reviews
+  app.get("/reviews", async (rea, res) => {
+    const reviews = await reviewCollection.find().toArray();
+    res.send(reviews);
+  });
+  // this api for all team-members
+  app.get("/team-members", async (rea, res) => {
+    const teamMembers = await teamMembersCollection.find().toArray();
+    res.send(teamMembers);
+  });
+}
+finally{
 
+}
 }
 run().catch(console.dir)
 
@@ -31,5 +49,5 @@ app.get('/',(req,res)=>{
 });
 
 app.listen(port,()=>{
-  console.log(`Jerins Parlour is listening prot ${port}`);
+  console.log(`Jerins Parlour is listening the prot ${port}`);
 } );
