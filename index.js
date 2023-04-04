@@ -1,6 +1,6 @@
 const  express = require('express');
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId, } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,22 +18,35 @@ const client = new MongoClient(uri, {
 async function run(){
 try{
   const servicesCollection = client.db("jerins_palour").collection("services");
+  const bookingCollection = client.db("jerins_palour").collection("bookings");
   const reviewCollection = client.db("jerins_palour").collection("reviews");
-  const teamMembersCollection = client
-    .db("jerins_palour")
-    .collection("team_members");
+  const teamMembersCollection = client.db("jerins_palour").collection("team_members");
   // this api for all services
-  app.get("/services", async (rea, res) => {
+  app.get("/services", async (req, res) => {
     const services = await servicesCollection.find().toArray();
     res.send(services);
   });
+  // this api for single service
+  //this api for specific booking
+  app.get("/services/:id", async (req, res) => {
+    const id = req.params.id;
+    const query ={_id:new ObjectId(id)};
+    const service = await servicesCollection.findOne(query);
+    res.send(service);
+  });
+  // this api for post service booked
+  app.post("/booked",async (req,res)=>{
+    const bookingData =req.body;
+    const booked = await bookingCollection.insertOne(bookingData);
+    res.send(booked); 
+  })
   // this api for all reviews
-  app.get("/reviews", async (rea, res) => {
+  app.get("/reviews", async (req, res) => {
     const reviews = await reviewCollection.find().toArray();
     res.send(reviews);
   });
   // this api for all team-members
-  app.get("/team-members", async (rea, res) => {
+  app.get("/team-members", async (req, res) => {
     const teamMembers = await teamMembersCollection.find().toArray();
     res.send(teamMembers);
   });
