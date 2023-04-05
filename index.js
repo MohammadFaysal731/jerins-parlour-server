@@ -34,17 +34,28 @@ try{
     const service = await servicesCollection.findOne(query);
     res.send(service);
   });
-  // this api for post service booked
-  app.post("/booked",async (req,res)=>{
+  // this api for get all booking
+  app.get('/booking',async (req,res)=>{
+    const allBooking= await bookingCollection.find().toArray()
+    res.send(allBooking);
+  })
+  // this api for all post service booking
+  app.post("/booking",async (req,res)=>{
     const bookingData =req.body;
-    const booked = await bookingCollection.insertOne(bookingData);
-    res.send(booked); 
+    const booking = await bookingCollection.insertOne(bookingData);
+    res.send(booking); 
   })
   // this api for all reviews
   app.get("/reviews", async (req, res) => {
     const reviews = await reviewCollection.find().toArray();
     res.send(reviews);
   });
+  // this api for post all reviews 
+  app.post('/reviews',async(req,res)=>{
+    const reviewData= req.body
+    const review = await reviewCollection.insertOne(reviewData);
+    res.send(review);
+  })
   // this api for all team-members
   app.get("/team-members", async (req, res) => {
     const teamMembers = await teamMembersCollection.find().toArray();
