@@ -1,5 +1,6 @@
 const  express = require('express');
 const cors = require("cors");
+const jwt =require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId, } = require("mongodb");
 require("dotenv").config();
 const app = express();
@@ -21,13 +22,13 @@ try{
   const bookingCollection = client.db("jerins_palour").collection("bookings");
   const reviewCollection = client.db("jerins_palour").collection("reviews");
   const teamMembersCollection = client.db("jerins_palour").collection("team_members");
+  const userCollection = client.db("jerins_palour").collection("users");
   // this api for all services
   app.get("/services", async (req, res) => {
     const services = await servicesCollection.find().toArray();
     res.send(services);
   });
   // this api for single service
-  //this api for specific booking
   app.get("/services/:id", async (req, res) => {
     const id = req.params.id;
     const query ={_id:new ObjectId(id)};
@@ -61,6 +62,21 @@ try{
     const teamMembers = await teamMembersCollection.find().toArray();
     res.send(teamMembers);
   });
+  // this api for store all users
+  app.put("/user/:email", async(req,res)=>{
+    const email = req.params.email;
+    const user =req.body;
+    const filter = {email:email};
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: user,
+    };
+    const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "30d",
+    });
+    const result = await userCollection.updateOne(filter, updateDoc, options);
+    res.send({result, token});
+  })
 }
 finally{
 
