@@ -21,7 +21,9 @@ try{
   const servicesCollection = client.db("jerins_palour").collection("services");
   const bookingCollection = client.db("jerins_palour").collection("bookings");
   const reviewCollection = client.db("jerins_palour").collection("reviews");
-  const teamMembersCollection = client.db("jerins_palour").collection("team_members");
+  const teamMembersCollection = client
+    .db("jerins_palour")
+    .collection("team_members");
   const userCollection = client.db("jerins_palour").collection("users");
   // this api for all services
   app.get("/services", async (req, res) => {
@@ -31,42 +33,60 @@ try{
   // this api for single service
   app.get("/services/:id", async (req, res) => {
     const id = req.params.id;
-    const query ={_id:new ObjectId(id)};
+    const query = { _id: new ObjectId(id) };
     const service = await servicesCollection.findOne(query);
     res.send(service);
   });
-  // this api for get all booking
-  app.get('/booking',async (req,res)=>{
-    const allBooking= await bookingCollection.find().toArray()
-    res.send(allBooking);
-  })
+  // // // this api for get all booking
+  app.get("/bookings", async (req, res) => {
+    const bookings = await bookingCollection.find().toArray();
+    res.send(bookings);
+  });
+  //this api for find specific user bookings by query
+  app.get("/booking", async (req, res) => {
+    // let query ={}
+    // if(req.query.email){
+        // query ={email:req.query.email}
+    // }
+     const email = req.query.email
+     const query ={email:email};  
+     const booking = await bookingCollection.find(query).toArray();
+     res.send(booking);
+  });
   // this api for all post service booking
-  app.post("/booking",async (req,res)=>{
-    const bookingData =req.body;
-    const booking = await bookingCollection.insertOne(bookingData);
-    res.send(booking); 
-  })
+  app.post("/bookings", async (req, res) => {
+    const bookingData = req.body;
+    const query ={email:bookingData.email, serviceName:bookingData.serviceName}
+    const exits = await bookingCollection.findOne(query);
+    if(exits){
+      return res.send(exits);
+    }
+    else{
+    const bookings = await bookingCollection.insertOne(bookingData);
+    return res.send(bookings); 
+    }
+  });
   // this api for all reviews
   app.get("/reviews", async (req, res) => {
     const reviews = await reviewCollection.find().toArray();
     res.send(reviews);
   });
-  // this api for post all reviews 
-  app.post('/reviews',async(req,res)=>{
-    const reviewData= req.body
+  // this api for post all reviews
+  app.post("/reviews", async (req, res) => {
+    const reviewData = req.body;
     const review = await reviewCollection.insertOne(reviewData);
     res.send(review);
-  })
+  });
   // this api for all team-members
   app.get("/team-members", async (req, res) => {
     const teamMembers = await teamMembersCollection.find().toArray();
     res.send(teamMembers);
   });
   // this api for store all users
-  app.put("/user/:email", async(req,res)=>{
+  app.put("/user/:email", async (req, res) => {
     const email = req.params.email;
-    const user =req.body;
-    const filter = {email:email};
+    const user = req.body;
+    const filter = { email: email };
     const options = { upsert: true };
     const updateDoc = {
       $set: user,
@@ -75,15 +95,14 @@ try{
       expiresIn: "30d",
     });
     const result = await userCollection.updateOne(filter, updateDoc, options);
-    res.send({result, token});
-  })
+    res.send({ result, token });
+  });
 }
 finally{
 
 }
 }
 run().catch(console.dir)
-
 app.get('/',(req,res)=>{
   res.send("Welcome to Jerins Parlour ")
 });
