@@ -21,14 +21,12 @@ try{
   const servicesCollection = client.db("jerins_palour").collection("services");
   const bookingCollection = client.db("jerins_palour").collection("bookings");
   const reviewCollection = client.db("jerins_palour").collection("reviews");
-  const teamMembersCollection = client
-    .db("jerins_palour")
-    .collection("team_members");
+  const teamMembersCollection = client.db("jerins_palour").collection("team_members");
   const userCollection = client.db("jerins_palour").collection("users");
   // this api for all services
   app.get("/services", async (req, res) => {
-    const services = await servicesCollection.find().toArray();
-    res.send(services);
+    const allServices = await servicesCollection.find().toArray();
+    res.send(allServices);
   });
   // this api for single service
   app.get("/services/:id", async (req, res) => {
@@ -37,7 +35,13 @@ try{
     const service = await servicesCollection.findOne(query);
     res.send(service);
   });
-  // // // this api for get all booking
+  // this api for post all service
+  app.post('/services',async(req,res)=>{
+    const serviceData=req.body;
+    const services =await servicesCollection.insertOne(serviceData)
+    res.send(services)
+  })
+  //  this api for get all booking
   app.get("/bookings", async (req, res) => {
     const bookings = await bookingCollection.find().toArray();
     res.send(bookings);
@@ -82,7 +86,12 @@ try{
     const teamMembers = await teamMembersCollection.find().toArray();
     res.send(teamMembers);
   });
-  // this api for store all users
+  // this api for all users
+  app.get('/users',async(req,res)=>{
+    const allUsers = await userCollection.find().toArray();
+    res.send(allUsers);
+  })
+  // this api for store users emails
   app.put("/user/:email", async (req, res) => {
     const email = req.params.email;
     const user = req.body;
