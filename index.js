@@ -141,7 +141,7 @@ async function run() {
       res.send({admin:isAdmin});
     })
     // this api for make admin
-    app.put("/user/admin/:email",verifyJWT, async (req, res) => {
+    app.patch("/user/admin/:email",verifyJWT, async (req, res) => {
       const email = req.params.email;
       const requester=req.decoded.email; 
       const requesterAccount = await userCollection.findOne({email:requester})
@@ -158,7 +158,15 @@ async function run() {
       }
       
     });
-  } finally {
+    //this api for delete user
+    app.delete("/user/:id",async(req,res)=>{
+      const id =req.params.id;
+      const query = {_id:new ObjectId(id)}
+      const result = await userCollection.deleteOne(query);
+      res.send(result)
+    })
+  } 
+  finally {
   }
 }
 run().catch(console.dir);
