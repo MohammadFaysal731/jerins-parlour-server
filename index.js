@@ -60,6 +60,18 @@ async function run() {
       const services = await servicesCollection.insertOne(serviceData);
       res.send(services);
     });
+    //this api for update a service
+    app.put('/services/:id',async(req,res)=>{
+      const id =req.params.id;
+      const updatedServiceData = req.body;
+      const filter= {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: updatedServiceData,
+      };
+      const updatedService = await servicesCollection.updateOne(filter,updateDoc);
+      res.send(updatedService)
+      
+    })
     //this api for delete a service
     app.delete('/services/:id', async(req, res)=>{
       const id = req.params.id;
