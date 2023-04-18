@@ -42,6 +42,17 @@ async function run() {
       .db("jerins_palour")
       .collection("team_members");
     const userCollection = client.db("jerins_palour").collection("users");
+    // this is verifyAdmin function
+      const verifyAdmin = async (req, res, next)=>{
+      const requester=req.decoded.email; 
+      const requesterAccount = await userCollection.findOne({email:requester})
+      if(requesterAccount.role === "admin"){
+        next();
+      }
+      else{
+       return res.status(403).send({ message: "Forbidden Access" });
+      }
+    }
     // this api for all services
     app.get("/services", async (req, res) => {
       const allServices = await servicesCollection.find().toArray();
@@ -55,7 +66,7 @@ async function run() {
       res.send(service);
     });
     // this api for post all service
-    app.post("/services", async (req, res) => {
+    app.post("/services",verifyJWT,verifyAdmin, async (req, res) => {
       const serviceData = req.body;
       const services = await servicesCollection.insertOne(serviceData);
       res.send(services);
@@ -160,22 +171,32 @@ async function run() {
       res.send({admin:isAdmin});
     })
     // this api for make admin
-    app.patch("/user/admin/:email",verifyJWT, async (req, res) => {
+    // app.patch("/user/admin/:email",verifyJWT, async (req, res) => {
+    //   const email = req.params.email;
+    //   const requester=req.decoded.email; 
+    //   const requesterAccount = await userCollection.findOne({email:requester})
+    //   if(requesterAccount.role === "admin"){
+    //     const filter = { email: email };
+    //   const updateDoc = {
+    //     $set:{role:"admin"},
+    //   };
+    //   const result = await userCollection.updateOne(filter, updateDoc);
+    //   return res.send(result);
+    //   }
+    //   else{
+    //    return res.status(403).send({message:"Forbidden Access"})
+    //   }
+      
+    // });
+    // this api for make admin. this is update version
+    app.patch("/user/admin/:email",verifyJWT, verifyAdmin, async (req, res) => {
       const email = req.params.email;
-      const requester=req.decoded.email; 
-      const requesterAccount = await userCollection.findOne({email:requester})
-      if(requesterAccount.role === "admin"){
-        const filter = { email: email };
+      const filter = { email: email };
       const updateDoc = {
         $set:{role:"admin"},
       };
       const result = await userCollection.updateOne(filter, updateDoc);
-      return res.send(result);
-      }
-      else{
-       return res.status(403).send({message:"Forbidden Access"})
-      }
-      
+       res.send(result);
     });
     //this api for delete user
     app.delete("/user/:email",async(req,res)=>{
