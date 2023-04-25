@@ -95,6 +95,13 @@ async function run() {
       const bookings = await bookingCollection.find().toArray();
       res.send(bookings);
     });
+    //this api for single booking 
+    app.get("/bookings/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const booking = await bookingCollection.findOne(query);
+      res.send(booking);
+    });
     //  this api for get specific booking
     app.get("/booking", verifyJWT, async (req, res) => {
       const email = req.query.email;
