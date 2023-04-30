@@ -59,15 +59,15 @@ async function run() {
 
     // this api for acceptation payment
     app.post("/create-payment-intent", async (req, res) => {
-      const booking =req.body;
-      const price =booking.price;
+      const booking = req.body;
+      const price = booking.price;
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: "usd",
-        payment_method_types:['card']
+        payment_method_types: ["card"],
       });
-      res.send({clientSecret:paymentIntent.client_secret})
+      res.send({ clientSecret: paymentIntent.client_secret });
     });
     // this api for all services
     app.get("/services", async (req, res) => {
@@ -148,10 +148,10 @@ async function run() {
       }
     });
     //this api for store payment id on booking info
-    app.patch('/booking/:id',async (req, res) =>{
+    app.patch("/booking/:id", async (req, res) => {
       const id = req.params.id;
-      const payment =req.body;
-      const filter={_id:new ObjectId(id)};
+      const payment = req.body;
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           paid: true,
@@ -159,9 +159,43 @@ async function run() {
         },
       };
       const allPayment = await paymentCollection.insertOne(payment);
-      const updateBooking = await bookingCollection.updateOne(filter,updateDoc)
+      const updateBooking = await bookingCollection.updateOne(
+        filter,
+        updateDoc
+      );
       res.send(updateBooking);
     });
+    //this api for add done booking
+    app.patch("/booking-done/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { bookingStatus: "Done" },
+      };
+      const doneBooking = await bookingCollection.updateOne(filter, updateDoc);
+      res.send(doneBooking);
+    });
+    //this api for add ongoing booking
+    app.patch("/booking-ongoing/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { bookingStatus: "On Going" },
+      };
+      const doneBooking = await bookingCollection.updateOne(filter, updateDoc);
+      res.send(doneBooking);
+    });
+    // // this api for remove done booking
+    app.patch("/booking-remove/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { bookingStatus: "Pending" },
+      };
+      const doneBooking = await bookingCollection.updateOne(filter, updateDoc);
+      res.send(doneBooking);
+    });
+
     // this api for all reviews
     app.get("/reviews", async (req, res) => {
       const reviews = await reviewCollection.find().toArray();
