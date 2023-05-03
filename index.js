@@ -195,7 +195,13 @@ async function run() {
       const doneBooking = await bookingCollection.updateOne(filter, updateDoc);
       res.send(doneBooking);
     });
-
+    //this api for delete booking 
+    app.delete('/booking/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query ={_id:new ObjectId(id)};
+      const deletedBooking= await bookingCollection.deleteOne(query);
+      res.send(deletedBooking);
+    })
     // this api for all reviews
     app.get("/reviews", async (req, res) => {
       const reviews = await reviewCollection.find().toArray();
