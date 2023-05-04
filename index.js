@@ -70,12 +70,12 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
     // this api for all services
-    app.get("/services", async (req, res) => {
+    app.get("/services",verifyJWT, async (req, res) => {
       const allServices = await servicesCollection.find().toArray();
       res.send(allServices);
     });
     // this api for single service
-    app.get("/services/:id", async (req, res) => {
+    app.get("/services/:id",verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const service = await servicesCollection.findOne(query);
@@ -88,7 +88,7 @@ async function run() {
       res.send(services);
     });
     //this api for update a service
-    app.put("/services/:id", async (req, res) => {
+    app.put("/services/:id",verifyJWT,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const updatedServiceData = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -102,7 +102,7 @@ async function run() {
       res.send(updatedService);
     });
     //this api for delete a service
-    app.delete("/services/:id", async (req, res) => {
+    app.delete("/services/:id",verifyJWT,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await servicesCollection.deleteOne(query);
@@ -121,7 +121,7 @@ async function run() {
       res.send(booking);
     });
     //  this api for get specific booking
-    app.get("/booking", verifyJWT, async (req, res) => {
+    app.get("/booking", verifyJWT,  async (req, res) => {
       const email = req.query.email;
       const decodedEmail = req.decoded.email;
       if (email === decodedEmail) {
@@ -133,7 +133,7 @@ async function run() {
       }
     });
     // this api for all post service booking
-    app.post("/bookings", async (req, res) => {
+    app.post("/bookings",verifyJWT,verifyAdmin, async (req, res) => {
       const bookingData = req.body;
       const query = {
         email: bookingData.email,
@@ -148,7 +148,7 @@ async function run() {
       }
     });
     //this api for store payment id on booking info
-    app.patch("/booking/:id", async (req, res) => {
+    app.patch("/booking/:id",verifyJWT,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const payment = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -166,7 +166,7 @@ async function run() {
       res.send(updateBooking);
     });
     //this api for add done booking
-    app.patch("/booking-done/:id", async (req, res) => {
+    app.patch("/booking-done/:id",verifyJWT,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -176,7 +176,7 @@ async function run() {
       res.send(doneBooking);
     });
     //this api for add ongoing booking
-    app.patch("/booking-ongoing/:id", async (req, res) => {
+    app.patch("/booking-ongoing/:id",verifyJWT,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -186,7 +186,7 @@ async function run() {
       res.send(doneBooking);
     });
     // // this api for remove done booking
-    app.patch("/booking-remove/:id", async (req, res) => {
+    app.patch("/booking-remove/:id",verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -196,25 +196,25 @@ async function run() {
       res.send(doneBooking);
     });
     //this api for delete booking 
-    app.delete('/booking/:id',async(req,res)=>{
+    app.delete('/booking/:id',verifyJWT, verifyAdmin, async(req,res)=>{
       const id = req.params.id;
       const query ={_id:new ObjectId(id)};
       const deletedBooking= await bookingCollection.deleteOne(query);
       res.send(deletedBooking);
     })
     // this api for all reviews
-    app.get("/reviews", async (req, res) => {
+    app.get("/reviews",verifyJWT, async (req, res) => {
       const reviews = await reviewCollection.find().toArray();
       res.send(reviews);
     });
     // this api for post all reviews
-    app.post("/reviews", async (req, res) => {
+    app.post("/reviews",verifyJWT, async (req, res) => {
       const reviewData = req.body;
       const review = await reviewCollection.insertOne(reviewData);
       res.send(review);
     });
     // this api for all team-members
-    app.get("/team-members", async (req, res) => {
+    app.get("/team-members",verifyJWT, async (req, res) => {
       const teamMembers = await teamMembersCollection.find().toArray();
       res.send(teamMembers);
     });
@@ -283,7 +283,7 @@ async function run() {
       }
     );
     //this api for delete user
-    app.delete("/user/:email", async (req, res) => {
+    app.delete("/user/:email",verifyJWT,verifyAdmin, async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const result = await userCollection.deleteOne(filter);
