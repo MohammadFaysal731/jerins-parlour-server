@@ -70,12 +70,12 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
     // this api for all services
-    app.get("/services",verifyJWT, async (req, res) => {
+    app.get("/services", async (req, res) => {
       const allServices = await servicesCollection.find().toArray();
       res.send(allServices);
     });
     // this api for single service
-    app.get("/services/:id",verifyJWT, async (req, res) => {
+    app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const service = await servicesCollection.findOne(query);
@@ -203,7 +203,7 @@ async function run() {
       res.send(deletedBooking);
     })
     // this api for all reviews
-    app.get("/reviews",verifyJWT, async (req, res) => {
+    app.get("/reviews", async (req, res) => {
       const reviews = await reviewCollection.find().toArray();
       res.send(reviews);
     });
