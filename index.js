@@ -133,7 +133,7 @@ async function run() {
       }
     });
     // this api for all post service booking
-    app.post("/bookings",verifyJWT,verifyAdmin, async (req, res) => {
+    app.post("/bookings",verifyJWT, async (req, res) => {
       const bookingData = req.body;
       const query = {
         email: bookingData.email,
@@ -148,7 +148,7 @@ async function run() {
       }
     });
     //this api for store payment id on booking info
-    app.patch("/booking/:id",verifyJWT,verifyAdmin, async (req, res) => {
+    app.patch("/booking/:id",verifyJWT, async (req, res) => {
       const id = req.params.id;
       const payment = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -214,7 +214,7 @@ async function run() {
       res.send(review);
     });
     // this api for all team-members
-    app.get("/team-members",verifyJWT, async (req, res) => {
+    app.get("/team-members", async (req, res) => {
       const teamMembers = await teamMembersCollection.find().toArray();
       res.send(teamMembers);
     });
